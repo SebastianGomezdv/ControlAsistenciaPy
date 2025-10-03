@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de Entrada y Salida</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script>
+    function mostrarProcesando() {
+        let video = document.getElementById("camara");
+
+        // congelar la imagen 
+        let canvas = document.createElement("canvas");
+        canvas.width = video.width;
+        canvas.height = video.height;
+        let ctx = canvas.getContext("2d");
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        video.src = canvas.toDataURL("image/jpeg");
+
+        // mostrar el mensaje
+        document.getElementById("procesando").style.display = "block";
+
+        // enviar el registro por un fetch
+        fetch("{{ url_for('registrar') }}", { method: "POST" })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === "ok") {
+                // tiempo de descongelar la camara
+                setTimeout(() => {
+                    video.src = "{{ url_for('video_feed') }}";
+                }, 310);
+
+                // mensaje de guardando registro (tiempo)
+                setTimeout(() => {
+                    document.getElementById("procesando").style.display = "none";
+                }, 3000);
+            }
+        });
+    }
+</script>
+
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Registro de Entrada y Salida</h1>
+
+        <div class="video-container">
+            <img id="camara" src="{{ url_for('video_feed') }}" width="480" height="320">
+        </div>
+
+        <form id="formRegistro" method="POST" action="{{ url_for('registrar') }}">
+            <button type="button" onclick="mostrarProcesando()">Registrar</button>
+        </form>
+
+        <div id="procesando" class="mensaje-procesando">
+            Guardando registro, por favor espere...
+        </div>
+    </div>
+</body>
+</html>
