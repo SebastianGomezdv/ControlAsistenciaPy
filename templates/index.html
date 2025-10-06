@@ -2,58 +2,114 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Registro de Entrada y Salida</title>
+    <title>Registro de Entrada y Salida | Grupo Uribe</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
     <script>
-    function mostrarProcesando() {
-        let video = document.getElementById("camara");
+        async function mostrarProcesando() {
+            const video = document.getElementById("camara");
+            const procesando = document.getElementById("procesando");
+            const boton = document.querySelector("button");
 
-        // congelar la imagen 
-        let canvas = document.createElement("canvas");
-        canvas.width = video.width;
-        canvas.height = video.height;
-        let ctx = canvas.getContext("2d");
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        video.src = canvas.toDataURL("image/jpeg");
+            // Captura y congela visualmente
+            const canvas = document.createElement("canvas");
+            canvas.width = video.width;
+            canvas.height = video.height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imagenCongelada = canvas.toDataURL("image/jpeg");
+            const original = video.src;
+            video.src = imagenCongelada;
 
-        // mostrar el mensaje
-        document.getElementById("procesando").style.display = "block";
+            procesando.style.display = "block";
+            boton.disabled = true;
+            boton.style.backgroundColor = "#999";
+            boton.textContent = "Procesando...";
 
-        // enviar el registro por un fetch
-        fetch("{{ url_for('registrar') }}", { method: "POST" })
-        .then(response => response.json())
-        .then(data => {
-            if (data.status === "ok") {
-                // tiempo de descongelar la camara
-                setTimeout(() => {
-                    video.src = "{{ url_for('video_feed') }}";
-                }, 310);
+            let exito = false;
+            let tipo = null;
 
-                // mensaje de guardando registro (tiempo)
-                setTimeout(() => {
-                    document.getElementById("procesando").style.display = "none";
-                }, 3000);
+            try {
+                const res = await fetch("{{ url_for('registrar') }}", { method: "POST" });
+                if (res.ok) {
+                    const data = await res.json();
+                    exito = true;
+                    tipo = data.tipo;
+                }
+            } catch {
+                exito = false;
             }
-        });
-    }
-</script>
 
+            // Descongelar antes
+            setTimeout(() => video.src = original, 1000);
+
+            // Terminar proceso
+            setTimeout(() => {
+                procesando.style.display = "none";
+
+                if (exito) {
+                    boton.style.backgroundColor = "#4CAF50";
+                    boton.textContent = "✅ Registrado";
+                    reproducirSonido(true);
+
+                    if (tipo === "entrada") {
+                        mostrarMensajeFinal();
+                    }
+                } else {
+                    boton.style.backgroundColor = "#f44336";
+                    boton.textContent = "❌ Error";
+                    reproducirSonido(false);
+                }
+
+                setTimeout(() => {
+                    boton.disabled = false;
+                    boton.style.backgroundColor = "#5468ff";
+                    boton.textContent = "Registrar";
+                }, 1500);
+            }, 2200);
+        }
+
+        function reproducirSonido(exito) {
+            const sonido = new Audio(exito
+                ? "https://cdn.pixabay.com/audio/2022/03/15/audio_b5d1478e7d.mp3"
+                : "https://cdn.pixabay.com/audio/2022/03/15/audio_5e88c904c4.mp3");
+            sonido.play();
+        }
+
+        function mostrarMensajeFinal() {
+            const overlay = document.createElement("div");
+            overlay.classList.add("overlay");
+
+            const mensaje = document.createElement("div");
+            mensaje.classList.add("mensaje-final");
+            mensaje.innerHTML = "Recuerda marcar la salida cuando finalices tu jornada 👋";
+
+            overlay.appendChild(mensaje);
+            document.body.appendChild(overlay);
+
+            setTimeout(() => {
+                overlay.classList.add("oculto");
+                setTimeout(() => overlay.remove(), 600);
+            }, 3000);
+        }
+    </script>
 </head>
+
 <body>
+    <div class="header">
+        <h1 class="logo"><span class="grupo">Grupo</span> <span class="uribe">Uribe</span></h1>
+    </div>
+
     <div class="container">
-        <h1>📋 Registro de Entrada y Salida</h1>
+        <h2>📋 Registro de Entrada y Salida</h2>
 
         <div class="video-container">
             <img id="camara" src="{{ url_for('video_feed') }}" width="480" height="320">
         </div>
 
-        <form id="formRegistro" method="POST" action="{{ url_for('registrar') }}">
-            <button type="button" onclick="mostrarProcesando()">Registrar</button>
-        </form>
-
-        <div id="procesando" class="mensaje-procesando">
-            Guardando registro, por favor espere...
-        </div>
+        <button type="button" onclick="mostrarProcesando()">Registrar</button>
+        <div id="procesando" class="mensaje-procesando">Guardando registro, por favor espere...</div>
     </div>
 </body>
 </html>

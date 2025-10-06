@@ -1,81 +1,189 @@
+/* === FUENTE Y BASE === */
 body {
-    font-family: Arial, sans-serif;
-    background: #f4f7fa;
+    font-family: 'Poppins', Arial, sans-serif;
+    background: #ffffff;
     margin: 0;
     padding: 0;
-    text-align: center;
-    color: #333;
+    color: #2c2c2c;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    flex-direction: column;
 }
 
+/* === LOGO === */
+.header {
+    position: absolute;
+    top: 20px;
+    left: 40px;
+    text-align: left;
+}
+
+.logo {
+    font-size: 30px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.logo .grupo {
+    color: #2d2d2d;
+}
+
+.logo .uribe {
+    color: #5468ff;
+}
+
+/* === CONTENEDOR CENTRAL === */
 .container {
-    margin-top: 40px;
+    background: #fff;
+    border-radius: 16px;
+    padding: 35px 45px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    max-width: 600px;
+    width: 90%;
+    text-align: center;
+    border-top: 6px solid #5468ff;
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
-h1 {
-    color: #2c3e50;
-    margin-bottom: 20px;
+/* === SUBTÍTULO === */
+h2 {
+    font-size: 22px;
+    color: #1d1d1d;
+    margin-bottom: 25px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
+/* === VIDEO === */
 .video-container {
-    margin: 10px auto;
-    padding: 20px;
-    border: none;
     border-radius: 12px;
-    display: inline-block;
-    width: 550px;
-    margin-right: 20px;
+    overflow: hidden;
+    margin-bottom: 25px;
+    border: 2px solid #f1f1f1;
 }
 
 #camara {
     width: 100%;
-    height: 100%;
-    border-radius: 10px;
+    height: auto;
     display: block;
-    margin: auto;
+    border-radius: 10px;
+    transition: opacity 0.4s ease;
 }
 
-/* boton */
+/* === BOTÓN === */
 button {
-    background: #3498db;
+    background: #5468ff;
     color: #fff;
-    padding: 14px 24px;
-    font-size: 18px;
     border: none;
-    border-radius: 8px;
+    padding: 14px 28px;
+    font-size: 17px;
+    border-radius: 10px;
     cursor: pointer;
-    margin-top: 15px;
-    transition: background 0.3s ease;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    width: 100%;
 }
 
 button:hover {
-    background: #2980b9;
+    background: #4053e6;
+    box-shadow: 0 3px 10px rgba(84, 104, 255, 0.3);
 }
 
-/* mensaje de procesando */
+/* === MENSAJE DE PROCESO === */
 .mensaje-procesando {
     margin-top: 20px;
-    font-size: 20px;
-    color: #e67e22;
-    font-weight: bold;
+    font-size: 18px;
+    color: #5468ff;
+    font-weight: 500;
     display: none;
     text-align: center;
 }
 
-/* spinner */
 .mensaje-procesando::after {
     content: "";
     display: inline-block;
     margin-left: 10px;
-    width: 18px;
-    height: 18px;
-    border: 3px solid #e67e22;
+    width: 16px;
+    height: 16px;
+    border: 3px solid #5468ff;
     border-top: 3px solid transparent;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
     vertical-align: middle;
 }
 
+/* === SPINNER === */
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+/* === OVERLAY MENSAJE FINAL === */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.65);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    opacity: 1;
+    transition: opacity 0.6s ease;
+}
+
+.overlay.oculto {
+    opacity: 0;
+}
+
+.mensaje-final {
+    background: #fff;
+    color: #1d1d1d;
+    font-size: 20px;
+    font-weight: 600;
+    padding: 30px 40px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 600px) {
+    .container {
+        padding: 30px 25px;
+        width: 90%;
+        min-height: 500px;
+    }
+
+    h2 {
+        font-size: 20px;
+    }
+
+    .logo {
+        font-size: 26px;
+    }
+
+    button {
+        font-size: 16px;
+    }
+
+    .header {
+        left: 20px;
+        top: 15px;
+    }
 }

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, redirect, url_for, request
+from flask import Flask, render_template, Response, jsonify
 import cv2
 import csv
 import os
@@ -6,47 +6,44 @@ from datetime import datetime, time
 
 app = Flask(__name__)
 
-# Archivo CSV
 CSV_FILE = "registro.csv"
-
-# ID fijo por ahora (luego lo cambiaremos con reconocimiento real)
 EMPLEADO_ID = "Empleado1"
 
-# Variable global para congelar cámara
-last_frame = None       #  guardara el último frame válido
-freeze_camera = False   #  bandera para indicar si la cámara debe congelarse
-
-# inicializamos el archivo CSV si no existe
+# Crear CSV si no existe
 if not os.path.exists(CSV_FILE):
-    with open(CSV_FILE, mode="w", newline="") as f:
+    with open(CSV_FILE, "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow(["empleado_id", "fecha", "hora_entrada", "hora_salida", "horas_trabajadas"])
 
-# ------------------ logica del registro ------------------
-
 def registrar_evento():
+    """Registra entrada o salida según el último estado."""
     ahora = datetime.now()
     fecha = ahora.date().isoformat()
     hora_actual = ahora.strftime("%H:%M:%S")
 
     filas = []
     encontrado = False
+    tipo = "entrada"
 
-    # Leer el CSV
-    with open(CSV_FILE, mode="r", newline="") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            # si el empleado ya tiene entrada sin salida, marcar salida
-            if row["empleado_id"] == EMPLEADO_ID and row["fecha"] == fecha and row["hora_salida"] == "":
-                row["hora_salida"] = hora_actual
-                # calcular horas trabajadas
-                h_entrada = datetime.strptime(row["hora_entrada"], "%H:%M:%S")
-                h_salida = datetime.strptime(hora_actual, "%H:%M:%S")
-                row["horas_trabajadas"] = str(h_salida - h_entrada)
-                encontrado = True
-            filas.append(row)
+    # Leer registros actuales
+    if os.path.exists(CSV_FILE):
+        with open(CSV_FILE, "r", newline="") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if row["empleado_id"] == EMPLEADO_ID and row["fecha"] == fecha and row["hora_salida"] == "":
+                    # Registrar salida
+                    row["hora_salida"] = hora_actual
+                    try:
+                        h_entrada = datetime.strptime(row["hora_entrada"], "%H:%M:%S")
+                        h_salida = datetime.strptime(hora_actual, "%H:%M:%S")
+                        row["horas_trabajadas"] = str(h_salida - h_entrada)
+                    except:
+                        row["horas_trabajadas"] = ""
+                    encontrado = True
+                    tipo = "salida"
+                filas.append(row)
 
-    # si no había registro de entrada, creamos uno nuevo
+    # Si no había registro pendiente, crear nueva entrada
     if not encontrado:
         filas.append({
             "empleado_id": EMPLEADO_ID,
@@ -56,34 +53,27 @@ def registrar_evento():
             "horas_trabajadas": ""
         })
 
-    # Reescribir CSV
-    with open(CSV_FILE, mode="w", newline="") as f:
+    # Guardar cambios
+    with open(CSV_FILE, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=["empleado_id", "fecha", "hora_entrada", "hora_salida", "horas_trabajadas"])
         writer.writeheader()
         writer.writerows(filas)
 
-# ------------------ camara ------------------
+    return tipo
 
+# ------------------ STREAM DE CÁMARA ------------------
 def gen_frames():
-    global last_frame, freeze_camera
     camera = cv2.VideoCapture(0)
+    if not camera.isOpened():
+        return
 
     while True:
-        if freeze_camera and last_frame is not None:
-            #  mientras esté congelada, mostrar la última imagen
-            frame = last_frame
-        else:
-            success, frame = camera.read()
-            if not success:
-                break
-            # guardamos el último frame válido
-            last_frame = frame  
-
-        # convertimos frame en jpg
+        success, frame = camera.read()
+        if not success:
+            break
         ret, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
-        yield (b'--frame\r\n'
-               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        yield (b'--frame\r\nContent-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 @app.route('/')
 def index():
@@ -93,29 +83,23 @@ def index():
 def video_feed():
     return Response(gen_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
-from flask import jsonify
-
 @app.route('/registrar', methods=["POST"])
 def registrar():
-    global freeze_camera, last_frame
-    freeze_camera = True   #  congelamos
-    registrar_evento()
-    freeze_camera = False  #  liberamos casi inmediato
-    return jsonify({"status": "ok"})
-
-
-# ------------------ verificación de salida automática ------------------
+    tipo = registrar_evento()  # Solo se llama una vez
+    return jsonify({"status": "ok", "tipo": tipo})
 
 @app.before_request
 def verificar_salidas():
     ahora = datetime.now()
-    hora_limite = time(20, 0)  # 8:00 PM
+    hora_limite = time(20, 0)
     fecha = ahora.date().isoformat()
+
+    if not os.path.exists(CSV_FILE):
+        return
 
     filas = []
     cambios = False
-
-    with open(CSV_FILE, mode="r", newline="") as f:
+    with open(CSV_FILE, "r", newline="") as f:
         reader = csv.DictReader(f)
         for row in reader:
             if row["fecha"] == fecha and row["hora_salida"] == "" and ahora.time() >= hora_limite:
@@ -125,7 +109,7 @@ def verificar_salidas():
             filas.append(row)
 
     if cambios:
-        with open(CSV_FILE, mode="w", newline="") as f:
+        with open(CSV_FILE, "w", newline="") as f:
             writer = csv.DictWriter(f, fieldnames=["empleado_id", "fecha", "hora_entrada", "hora_salida", "horas_trabajadas"])
             writer.writeheader()
             writer.writerows(filas)
