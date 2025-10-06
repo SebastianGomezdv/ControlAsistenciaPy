@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registros de Empleados | GCO Grupo Uribe</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='registros.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <div class="navbar" style="width:100%; background:#5468ff; padding:10px; display:flex; gap:20px;">
+        <a href="{{ url_for('index') }}" style="color:#fff; text-decoration:none; font-weight:600;">Registro de Asistencia</a>
+        <a href="{{ url_for('registros') }}" style="color:#fff; text-decoration:none; font-weight:600;">Registros de Empleados</a>
+        <a href="{{ url_for('logout') }}" style="color:#fff; text-decoration:none; margin-left:auto;">Cerrar Sesión</a>
+    </div>
+
+    <div class="container" style="min-height:500px;">
+        <h2>📁 Registros de Empleados</h2>
+        <div class="archivos-container">
+            {% for archivo in archivos %}
+                <div class="archivo-item">
+                    <div class="archivo-link">
+                        <img class="archivo-icon" src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="Excel">
+                        <a href="{{ url_for('descargar_archivo', archivo=archivo) }}" target="_blank">{{ archivo }}</a>
+                    </div>
+                    <a href="{{ url_for('descargar_archivo', archivo=archivo) }}" style="color:#5468ff; font-weight:600;">⬇️</a>
+                </div>
+            {% endfor %}
+            {% if archivos|length == 0 %}
+                <p style="text-align:center; margin-top:50px;">No hay registros disponibles</p>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Seleccionar Fecha | GCO Grupo Uribe</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1 class="gco-title">GCO</h1>
+        <h2>Seleccionar Fecha</h2>
+
+        <form method="POST">
+            <input type="date" name="fecha" required>
+            <button type="submit">Continuar</button>
+        </form>
+    </div>
+</body>
+</html>

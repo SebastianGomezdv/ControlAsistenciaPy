@@ -1,18 +1,49 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
-    <title>Registro de Entrada y Salida | Grupo Uribe</title>
+    <title>Registro de Entrada y Salida | GCO Grupo Uribe</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <div class="navbar" style="width:1501; background:#5468ff; padding:10px; display:flex; gap:20px;">
+        <a href="{{ url_for('index') }}" style="color:#fff; text-decoration:none; font-weight:600;">Registro de
+            Asistencia</a>
+        <a href="{{ url_for('registros') }}" style="color:#fff; text-decoration:none; font-weight:600;">Registros de
+            Empleados</a>
+        <a href="{{ url_for('logout') }}" style="color:#fff; text-decoration:none; margin-left:auto;">Cerrar Sesión</a>
+    </div>
+
+    <div class="container">
+        <h1 style="color:#5468ff; font-weight:700; margin-bottom:5px;">GCO</h1>
+        <h2>📋 Registro de Entrada y Salida</h2>
+        <p>Fecha seleccionada: {{ fecha }}</p>
+
+        <div class="boton-guardar">
+            <button onclick="guardarRegistro()">💾 Guardar registro de hoy</button>
+        </div>
+
+        <div class="video-container">
+            <img id="camara" src="{{ url_for('video_feed') }}" width="640" height="400">
+        </div>
+
+        <button type="button" onclick="mostrarProcesando()" style="margin-bottom:10px;">Registrar</button>
+
+        <div id="procesando" class="mensaje-procesando">Guardando registro, por favor espere...</div>
+    </div>
 
     <script>
+        // -------- Registrar entrada/salida --------
         async function mostrarProcesando() {
             const video = document.getElementById("camara");
             const procesando = document.getElementById("procesando");
             const boton = document.querySelector("button");
 
-            // Captura y congela visualmente
+            // Captura congelada
             const canvas = document.createElement("canvas");
             canvas.width = video.width;
             canvas.height = video.height;
@@ -41,10 +72,8 @@
                 exito = false;
             }
 
-            // Descongelar antes
             setTimeout(() => video.src = original, 1000);
 
-            // Terminar proceso
             setTimeout(() => {
                 procesando.style.display = "none";
 
@@ -54,7 +83,9 @@
                     reproducirSonido(true);
 
                     if (tipo === "entrada") {
-                        mostrarMensajeFinal();
+                        mostrarMensajeFinal("Recuerda marcar la salida cuando finalices tu jornada 👋");
+                    } else {
+                        mostrarMensajeFinal("Hasta mañana, descansa 👋");
                     }
                 } else {
                     boton.style.backgroundColor = "#f44336";
@@ -77,15 +108,15 @@
             sonido.play();
         }
 
-        function mostrarMensajeFinal() {
+        function mostrarMensajeFinal(mensaje) {
             const overlay = document.createElement("div");
             overlay.classList.add("overlay");
 
-            const mensaje = document.createElement("div");
-            mensaje.classList.add("mensaje-final");
-            mensaje.innerHTML = "Recuerda marcar la salida cuando finalices tu jornada 👋";
+            const mensajeDiv = document.createElement("div");
+            mensajeDiv.classList.add("mensaje-final");
+            mensajeDiv.innerHTML = mensaje;
 
-            overlay.appendChild(mensaje);
+            overlay.appendChild(mensajeDiv);
             document.body.appendChild(overlay);
 
             setTimeout(() => {
@@ -93,23 +124,26 @@
                 setTimeout(() => overlay.remove(), 600);
             }, 3000);
         }
+
+        // -------- Guardar Excel --------
+        async function guardarExcel() {
+            try {
+                const res = await fetch("{{ url_for('guardar_excel') }}", { method: "POST" });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.status === "ok") {
+                        mostrarMensajeFinal("💾 Archivo guardado: " + data.archivo);
+                    } else {
+                        mostrarMensajeFinal("❌ " + data.msg);
+                    }
+                } else {
+                    mostrarMensajeFinal("❌ Error al guardar Excel");
+                }
+            } catch {
+                mostrarMensajeFinal("❌ Error al guardar Excel");
+            }
+        }
     </script>
-</head>
-
-<body>
-    <div class="header">
-        <h1 class="logo"><span class="grupo">Grupo</span> <span class="uribe">Uribe</span></h1>
-    </div>
-
-    <div class="container">
-        <h2>📋 Registro de Entrada y Salida</h2>
-
-        <div class="video-container">
-            <img id="camara" src="{{ url_for('video_feed') }}" width="480" height="320">
-        </div>
-
-        <button type="button" onclick="mostrarProcesando()">Registrar</button>
-        <div id="procesando" class="mensaje-procesando">Guardando registro, por favor espere...</div>
-    </div>
 </body>
+
 </html>

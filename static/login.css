@@ -1,0 +1,73 @@
+body {
+    font-family: 'Poppins', Arial, sans-serif;
+    background: #f5f5f5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.container {
+    background: #fff;
+    border-radius: 16px;
+    padding: 40px 50px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+}
+
+.gco-title {
+    color: #5468ff;
+    font-weight: 700;
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+h2 {
+    font-weight: 600;
+    font-size: 22px;
+    margin-bottom: 25px;
+}
+
+input[type="text"], input[type="password"], input[type="date"] {
+    width: 100%;
+    padding: 12px 0px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    transition: border-color 0.3s;
+    text-align: center;
+}
+
+input:focus {
+    border-color: #5468ff;
+    outline: none;
+}
+
+button {
+    width: 58vh;
+    padding: 14px;
+    background: #5468ff;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 17px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-bottom: 10px;
+}
+
+button:hover {
+    background: #4053e6;
+    box-shadow: 0 3px 10px rgba(84,104,255,0.3);
+}
+
+.error {
+    color: #f44336;
+    margin-bottom: 15px;
+    font-weight: 500;
+}

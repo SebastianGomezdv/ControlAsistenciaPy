@@ -1,4 +1,4 @@
-/* === FUENTE Y BASE === */
+/* === BASE === */
 body {
     font-family: 'Poppins', Arial, sans-serif;
     background: #ffffff;
@@ -26,21 +26,16 @@ body {
     letter-spacing: 0.5px;
 }
 
-.logo .grupo {
-    color: #2d2d2d;
-}
-
-.logo .uribe {
-    color: #5468ff;
-}
+.logo .grupo { color: #2d2d2d; }
+.logo .uribe { color: #5468ff; }
 
 /* === CONTENEDOR CENTRAL === */
 .container {
     background: #fff;
     border-radius: 16px;
-    padding: 35px 45px;
+    margin-top: 20px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    max-width: 600px;
+    max-width: 550px;
     width: 90%;
     text-align: center;
     border-top: 6px solid #5468ff;
@@ -51,31 +46,23 @@ body {
 }
 
 /* === SUBTÍTULO === */
-h2 {
-    font-size: 22px;
-    color: #1d1d1d;
-    margin-bottom: 25px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-}
+h2 { font-size: 22px; color: #1d1d1d; margin-bottom: 25px; font-weight: 600; }
 
 /* === VIDEO === */
 .video-container {
     border-radius: 12px;
     overflow: hidden;
-    margin-bottom: 25px;
-    border: 2px solid #f1f1f1;
+    margin-bottom: 20px;
 }
 
 #camara {
-    width: 100%;
-    height: auto;
+    width: 500px;
+    margin-left: 26px;
+    max-height: 400px; 
     display: block;
     border-radius: 10px;
     transition: opacity 0.4s ease;
+    object-fit: cover;
 }
 
 /* === BOTÓN === */
@@ -83,14 +70,16 @@ button {
     background: #5468ff;
     color: #fff;
     border: none;
-    padding: 14px 28px;
-    font-size: 17px;
+    padding: 12px 20px;
+    font-size: 16px;
     border-radius: 10px;
     cursor: pointer;
     font-weight: 600;
     letter-spacing: 0.5px;
     transition: all 0.3s ease;
-    width: 100%;
+    width: 80vh;
+    margin-bottom: 10px;
+    margin-left: 80px;
 }
 
 button:hover {
@@ -98,7 +87,20 @@ button:hover {
     box-shadow: 0 3px 10px rgba(84, 104, 255, 0.3);
 }
 
-/* === MENSAJE DE PROCESO === */
+.boton-guardar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 15px;
+}
+
+.boton-guardar button {
+    width: auto;
+    padding: 10px 20px;
+    font-size: 15px;
+    margin-right: 50px;
+}
+
+/* === MENSAJE PROCESO === */
 .mensaje-procesando {
     margin-top: 20px;
     font-size: 18px;
@@ -121,17 +123,13 @@ button:hover {
     vertical-align: middle;
 }
 
-/* === SPINNER === */
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-/* === OVERLAY MENSAJE FINAL === */
+/* === MENSAJE FINAL === */
 .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.65);
+    background: rgba(0,0,0,0.65);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -140,9 +138,7 @@ button:hover {
     transition: opacity 0.6s ease;
 }
 
-.overlay.oculto {
-    opacity: 0;
-}
+.overlay.oculto { opacity: 0; }
 
 .mensaje-final {
     background: #fff;
@@ -152,7 +148,7 @@ button:hover {
     padding: 30px 40px;
     border-radius: 16px;
     text-align: center;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
     max-width: 400px;
     animation: fadeIn 0.4s ease;
 }
@@ -164,26 +160,7 @@ button:hover {
 
 /* === RESPONSIVE === */
 @media (max-width: 600px) {
-    .container {
-        padding: 30px 25px;
-        width: 90%;
-        min-height: 500px;
-    }
-
-    h2 {
-        font-size: 20px;
-    }
-
-    .logo {
-        font-size: 26px;
-    }
-
-    button {
-        font-size: 16px;
-    }
-
-    .header {
-        left: 20px;
-        top: 15px;
-    }
+    .container { padding: 30px 25px; width: 90%; min-height: 500px; }
+    h2 { font-size: 20px; }
+    button { font-size: 16px; }
 }
