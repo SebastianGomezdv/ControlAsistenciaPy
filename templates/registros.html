@@ -8,13 +8,13 @@
 </head>
 <body>
     <!-- Navbar -->
-    <div class="navbar" style="width:100%; background:#5468ff; padding:10px; display:flex; gap:20px;">
-        <a href="{{ url_for('index') }}" style="color:#fff; text-decoration:none; font-weight:600;">Registro de Asistencia</a>
-        <a href="{{ url_for('registros') }}" style="color:#fff; text-decoration:none; font-weight:600;">Registros de Empleados</a>
-        <a href="{{ url_for('logout') }}" style="color:#fff; text-decoration:none; margin-left:auto;">Cerrar Sesión</a>
-    </div>
+    <nav class="navbar">
+        <a href="{{ url_for('index') }}">Registro de Asistencia</a>
+        <a href="{{ url_for('registros') }}">Registros de Empleados</a>
+        <a href="{{ url_for('logout') }}" class="logout">Cerrar Sesión</a>
+    </nav>
 
-    <div class="container" style="min-height:500px;">
+    <div class="container" style="min-height:500px; margin: 100px 0px 0px 400px;">
         <h2>📁 Registros de Empleados</h2>
         <div class="archivos-container">
             {% for archivo in archivos %}

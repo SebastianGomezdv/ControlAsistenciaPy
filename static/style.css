@@ -1,24 +1,50 @@
 /* === BASE === */
 body {
     font-family: 'Poppins', Arial, sans-serif;
-    background: #ffffff;
+    background: #f5f6fa;
     margin: 0;
     padding: 0;
     color: #2c2c2c;
+    min-height: 100vh;
+    width: 100vw;
+    box-sizing: border-box;
     display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
     flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
 }
 
-/* === LOGO === */
-.header {
-    position: absolute;
-    top: 20px;
-    left: 40px;
-    text-align: left;
+/* === NAVBAR === */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #5468ff;
+    color: #fff;
+    z-index: 1000;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    padding: 0 32px;
+    box-sizing: border-box;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
+.navbar a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 17px;
+    transition: color 0.2s;
+}
+.navbar a.logout {
+    margin-left: auto;
+}
+.navbar a:hover {
+    color: #ffe066;
+}
+
 
 .logo {
     font-size: 30px;
@@ -26,23 +52,32 @@ body {
     letter-spacing: 0.5px;
 }
 
-.logo .grupo { color: #2d2d2d; }
-.logo .uribe { color: #5468ff; }
+.logo .grupo { color: #fff; }
+.logo .uribe { color: #ffe066; }
 
 /* === CONTENEDOR CENTRAL === */
 .container {
     background: #fff;
     border-radius: 16px;
-    margin-top: 20px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    max-width: 550px;
-    width: 90%;
+    max-width: 430px;
+    width: 100%;
     text-align: center;
     border-top: 6px solid #5468ff;
-    min-height: 600px;
+    min-height: 40px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
+    align-items: center;
+    padding: 20px 20px 10px 20px;
+    position: relative;
+    margin: 10px 15px 5px 250px;
+}
+.titulo-gco {
+    color: #5468ff;
+    font-weight: 700;
+    margin-bottom: 5px;
+    margin-top: 0;
 }
 
 /* === SUBTÍTULO === */
@@ -51,18 +86,23 @@ h2 { font-size: 22px; color: #1d1d1d; margin-bottom: 25px; font-weight: 600; }
 /* === VIDEO === */
 .video-container {
     border-radius: 12px;
-    overflow: hidden;
+    overflow: visible;
     margin-bottom: 20px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 #camara {
-    width: 500px;
-    margin-left: 26px;
-    max-height: 400px; 
+    width: 100%;
+    max-width: 480px;
+    max-height: 320px;
     display: block;
     border-radius: 10px;
     transition: opacity 0.4s ease;
     object-fit: cover;
+    margin-top: 10px;
 }
 
 /* === BOTÓN === */
@@ -77,9 +117,14 @@ button {
     font-weight: 600;
     letter-spacing: 0.5px;
     transition: all 0.3s ease;
-    width: 80vh;
+    width: 100%;
+    max-width: 350px;
     margin-bottom: 10px;
-    margin-left: 80px;
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    z-index: 1;
+    display: block;
 }
 
 button:hover {
@@ -87,27 +132,48 @@ button:hover {
     box-shadow: 0 3px 10px rgba(84, 104, 255, 0.3);
 }
 
+/* === BOTÓN GUARDAR CENTRADO === */
 .boton-guardar {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
+    align-items: center;
     margin-bottom: 15px;
+    width: 100%;
 }
-
 .boton-guardar button {
     width: auto;
     padding: 10px 20px;
     font-size: 15px;
-    margin-right: 50px;
+    margin: 0 auto;
+    display: block;
 }
 
 /* === MENSAJE PROCESO === */
 .mensaje-procesando {
-    margin-top: 20px;
-    font-size: 18px;
-    color: #5468ff;
-    font-weight: 500;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(255,255,255,0.85);
     display: none;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #5468ff;
+    font-weight: 600;
+    z-index: 2000;
     text-align: center;
+    box-shadow: none;
+    padding: 0;
+}
+.mensaje-procesando span, .mensaje-procesando > div {
+    background: #fff;
+    border-radius: 16px;
+    padding: 30px 40px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+    display: inline-block;
+    margin-top: 0;
 }
 
 .mensaje-procesando::after {
@@ -150,17 +216,93 @@ button:hover {
     text-align: center;
     box-shadow: 0 6px 20px rgba(0,0,0,0.2);
     max-width: 400px;
-    animation: fadeIn 0.4s ease;
+    margin-left: 80px;
 }
 
-@keyframes fadeIn {
-    from { transform: scale(0.9); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
+
+/* === GUARDAR A LA DERECHA === */
+.guardar-derecha {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 70px;
+    margin-bottom: 10px;
+    padding: 0 40px 0 0;
+    box-sizing: border-box;
+}
+.guardar-derecha button {
+    background: #5468ff;
+    color: #fff;
+    border: none;
+    padding: 10px 22px;
+    font-size: 15px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.guardar-derecha button:hover {
+    background: #4053e6;
+}
+
+/* === MAIN FLEX === */
+.main-flex {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    width: 100vw;
+    max-width: 100vw;
+    min-height: calc(100vh - 74px);
+    margin-top: 54px;
+    box-sizing: border-box;
+    gap: 0;
+}
+
+.guardar-lateral {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    height: 100%;
+    margin-left: 16px;
+    margin-top: 20%;
+}
+.guardar-lateral button {
+    background: #5468ff;
+    color: #fff;
+    border: none;
+    padding: 12px 22px;
+    font-size: 15px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 0;
+}
+.guardar-lateral button:hover {
+    background: #4053e6;
 }
 
 /* === RESPONSIVE === */
 @media (max-width: 600px) {
-    .container { padding: 30px 25px; width: 90%; min-height: 500px; }
+    .container { padding: 18px 2vw 60px 2vw; width: 99vw; min-height: 500px; }
     h2 { font-size: 20px; }
-    button { font-size: 16px; }
+    button { font-size: 15px; max-width: 98vw; }
+    .header { padding: 0 10px; height: 50px; }
+    #camara { max-width: 98vw; }
+}
+
+@media (max-width: 900px) {
+    .main-flex {
+        flex-direction: column;
+        align-items: center;
+        padding-top: 20px;
+        gap: 10px;
+    }
+    .guardar-lateral {
+        align-items: center;
+        margin-left: 0;
+    }
 }

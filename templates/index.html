@@ -10,33 +10,38 @@
 
 <body>
     <!-- Navbar -->
-    <div class="navbar" style="width:1501; background:#5468ff; padding:10px; display:flex; gap:20px;">
-        <a href="{{ url_for('index') }}" style="color:#fff; text-decoration:none; font-weight:600;">Registro de
-            Asistencia</a>
-        <a href="{{ url_for('registros') }}" style="color:#fff; text-decoration:none; font-weight:600;">Registros de
-            Empleados</a>
-        <a href="{{ url_for('logout') }}" style="color:#fff; text-decoration:none; margin-left:auto;">Cerrar Sesión</a>
-    </div>
+    <nav class="navbar">
+        <a href="{{ url_for('index') }}">Registro de Asistencia</a>
+        <a href="{{ url_for('registros') }}">Registros de Empleados</a>
+        <a href="{{ url_for('logout') }}" class="logout">Cerrar Sesión</a>
+    </nav>
 
-    <div class="container">
-        <h1 style="color:#5468ff; font-weight:700; margin-bottom:5px;">GCO</h1>
-        <h2>📋 Registro de Entrada y Salida</h2>
-        <p>Fecha seleccionada: {{ fecha }}</p>
+    <div class="main-flex">
+        <div class="container">
+            <h1 class="titulo-gco">GCO</h1>
+            <h2>📋 Registro de Entrada y Salida</h2>
+            <p>Fecha seleccionada: {{ fecha }}</p>
 
-        <div class="boton-guardar">
+            <div class="video-container">
+                <img id="camara" src="{{ url_for('video_feed') }}" width="640" height="400">
+            </div>
+
+            <button type="button" onclick="mostrarProcesando()">Registrar</button>
+
+            <div id="procesando" class="mensaje-procesando">Guardando registro, por favor espere...</div>
+        </div>
+        <div class="guardar-lateral">
             <button onclick="guardarRegistro()">💾 Guardar registro de hoy</button>
         </div>
-
-        <div class="video-container">
-            <img id="camara" src="{{ url_for('video_feed') }}" width="640" height="400">
-        </div>
-
-        <button type="button" onclick="mostrarProcesando()" style="margin-bottom:10px;">Registrar</button>
-
-        <div id="procesando" class="mensaje-procesando">Guardando registro, por favor espere...</div>
     </div>
 
     <script>
+        // Forzar ocultar el mensaje de procesando al cargar la página
+        window.addEventListener('DOMContentLoaded', function() {
+            var procesando = document.getElementById('procesando');
+            if (procesando) procesando.style.display = 'none';
+        });
+
         // -------- Registrar entrada/salida --------
         async function mostrarProcesando() {
             const video = document.getElementById("camara");
