@@ -11,7 +11,7 @@
 <body>
     <!-- Navbar -->
     <nav class="navbar">
-        <a href="{{ url_for('index') }}">Registro de Asistencia</a>
+        <a href="{{ url_for('asistencia', fecha=fecha) }}">Registro de Asistencia</a>
         <a href="{{ url_for('registros') }}">Registros de Empleados</a>
         <a href="{{ url_for('logout') }}" class="logout">Cerrar Sesión</a>
     </nav>
@@ -24,14 +24,18 @@
 
             <div class="video-container">
                 <img id="camara" src="{{ url_for('video_feed') }}" width="640" height="400">
+                <!-- Canvas para mostrar la "foto" congelada -->
+                <canvas id="canvas-snapshot" width="640" height="400" style="display: none; border-radius: 10px; max-width: 100%;"></canvas>
             </div>
 
-            <button type="button" onclick="mostrarProcesando()">Registrar</button>
+            <button type="button" onclick="registrarAsistencia()">Registrar</button>
 
-            <div id="procesando" class="mensaje-procesando">Guardando registro, por favor espere...</div>
+            <div id="procesando" class="mensaje-procesando">
+                <span>Guardando registro, por favor espere...</span>
+            </div>
         </div>
         <div class="guardar-lateral">
-            <button onclick="guardarRegistro()">💾 Guardar registro de hoy</button>
+            <button onclick="guardarRegistrosDeHoy()">💾 Guardar registro de hoy</button>
         </div>
     </div>
 
@@ -43,22 +47,26 @@
         });
 
         // -------- Registrar entrada/salida --------
-        async function mostrarProcesando() {
+        async function registrarAsistencia() {
             const video = document.getElementById("camara");
+            const canvas = document.getElementById("canvas-snapshot");
+            const context = canvas.getContext("2d");
             const procesando = document.getElementById("procesando");
-            const boton = document.querySelector("button");
+            const boton = document.querySelector("button[type='button']");
 
-            // Captura congelada
-            const canvas = document.createElement("canvas");
-            canvas.width = video.width;
-            canvas.height = video.height;
-            const ctx = canvas.getContext("2d");
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const imagenCongelada = canvas.toDataURL("image/jpeg");
-            const original = video.src;
-            video.src = imagenCongelada;
+            // --- LÓGICA PARA CONGELAR LA IMAGEN ---
+            // 1. Ajustar el tamaño del canvas al tamaño visible de la imagen
+            canvas.width = video.clientWidth;
+            canvas.height = video.clientHeight;
+            // 2. Dibujar la imagen actual del video en el canvas
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            // 3. Ocultar el video en vivo y mostrar el canvas con la foto
+            video.style.display = "none";
+            canvas.style.display = "block";
+            // --- FIN DE LA LÓGICA DE CONGELACIÓN ---
 
-            procesando.style.display = "block";
+            // Mostrar animación de "procesando" y deshabilitar botón
+            procesando.style.display = "flex";
             boton.disabled = true;
             boton.style.backgroundColor = "#999";
             boton.textContent = "Procesando...";
@@ -67,18 +75,17 @@
             let tipo = null;
 
             try {
-                const res = await fetch("{{ url_for('registrar') }}", { method: "POST" });
+                const res = await fetch("{{ url_for('registrar', fecha=fecha) }}", { method: "POST" });
                 if (res.ok) {
                     const data = await res.json();
                     exito = true;
                     tipo = data.tipo;
                 }
-            } catch {
+            } catch(e) {
+                console.error("Error al registrar:", e);
                 exito = false;
             }
-
-            setTimeout(() => video.src = original, 1000);
-
+            
             setTimeout(() => {
                 procesando.style.display = "none";
 
@@ -86,7 +93,6 @@
                     boton.style.backgroundColor = "#4CAF50";
                     boton.textContent = "✅ Registrado";
                     reproducirSonido(true);
-
                     if (tipo === "entrada") {
                         mostrarMensajeFinal("Recuerda marcar la salida cuando finalices tu jornada 👋");
                     } else {
@@ -102,8 +108,31 @@
                     boton.disabled = false;
                     boton.style.backgroundColor = "#5468ff";
                     boton.textContent = "Registrar";
+
+                    // --- LÓGICA PARA DESCONGELAR LA IMAGEN ---
+                    // 4. Ocultar la foto (canvas) y volver a mostrar el video en vivo
+                    canvas.style.display = "none";
+                    video.style.display = "block";
+                    // --- FIN DE LA LÓGICA ---
                 }, 1500);
-            }, 2200);
+            }, 1000);
+        }
+        
+        // -------- Guardar Registros del Día en Excel --------
+        async function guardarRegistrosDeHoy() {
+            try {
+                const res = await fetch("{{ url_for('guardar_registros_dia') }}", { method: "POST" });
+                const data = await res.json();
+
+                if (res.ok && data.status === "ok") {
+                    mostrarMensajeFinal("✅ " + data.msg);
+                } else {
+                    mostrarMensajeFinal("❌ " + (data.msg || "Error desconocido al guardar."));
+                }
+            } catch (e) {
+                console.error("Error en la solicitud para guardar:", e);
+                mostrarMensajeFinal("❌ Error de conexión al intentar guardar el registro.");
+            }
         }
 
         function reproducirSonido(exito) {
@@ -114,6 +143,11 @@
         }
 
         function mostrarMensajeFinal(mensaje) {
+            const overlayExistente = document.querySelector(".overlay");
+            if (overlayExistente) {
+                overlayExistente.remove();
+            }
+
             const overlay = document.createElement("div");
             overlay.classList.add("overlay");
 
@@ -128,25 +162,6 @@
                 overlay.classList.add("oculto");
                 setTimeout(() => overlay.remove(), 600);
             }, 3000);
-        }
-
-        // -------- Guardar Excel --------
-        async function guardarExcel() {
-            try {
-                const res = await fetch("{{ url_for('guardar_excel') }}", { method: "POST" });
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.status === "ok") {
-                        mostrarMensajeFinal("💾 Archivo guardado: " + data.archivo);
-                    } else {
-                        mostrarMensajeFinal("❌ " + data.msg);
-                    }
-                } else {
-                    mostrarMensajeFinal("❌ Error al guardar Excel");
-                }
-            } catch {
-                mostrarMensajeFinal("❌ Error al guardar Excel");
-            }
         }
     </script>
 </body>

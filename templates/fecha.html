@@ -12,9 +12,19 @@
         <h2>Seleccionar Fecha</h2>
 
         <form method="POST">
-            <input type="date" name="fecha" required>
+            <input type="date" name="fecha" id="fecha-selector" required>
             <button type="submit">Continuar</button>
         </form>
     </div>
+
+    <script>
+        // Bloquear fechas futuras en el calendario
+        document.addEventListener('DOMContentLoaded', function() {
+            const fechaInput = document.getElementById('fecha-selector');
+            const hoy = new Date().toISOString().split('T')[0];
+            fechaInput.setAttribute('max', hoy);
+            fechaInput.value = hoy; // Opcional: Poner la fecha de hoy por defecto
+        });
+    </script>
 </body>
 </html>

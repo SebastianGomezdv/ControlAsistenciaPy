@@ -43,34 +43,107 @@ body {
     padding: 30px;
     border-radius: 16px;
     box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    text-align: center;
 }
 
 h1 { color: #5468ff; margin-bottom: 20px; }
-h2 { font-weight: 600; margin-bottom: 25px; }
+h2 { font-weight: 600; margin-bottom: 25px; text-align: center; }
 
+/* --- Formulario de Filtro --- */
+.filtro-form {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+}
+.filtro-form input[type="date"] {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-family: 'Poppins', sans-serif;
+}
+.filtro-form button {
+    padding: 8px 16px;
+    background: #5468ff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    /* FUENTE AÑADIDA */
+    font-family: 'Poppins', sans-serif;
+}
+.filtro-form button:hover {
+    background: #4053e6;
+}
+.filtro-form .limpiar-filtro {
+    padding: 8px 16px;
+    background: #757575;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+}
+.filtro-form .limpiar-filtro:hover {
+    background: #616161;
+}
+
+/* --- Contenedor de Archivos --- */
 .archivos-container {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 8px;
+}
+
+/* --- Separador de Fecha --- */
+.separador-fecha {
+    text-align: left;
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-top: 20px;
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #eee;
 }
 
 .archivo-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: #f5f5f5;
-    padding: 12px 15px;
+    background: #f9f9f9;
+    padding: 12px 20px;
     border-radius: 10px;
-    transition: background 0.3s;
+    transition: background 0.3s, transform 0.2s;
+    border: 1px solid #eee;
 }
 
-.archivo-item:hover { background: #e0e0e0; }
+.archivo-item:hover { 
+    background: #f0f0f0; 
+    transform: translateY(-2px);
+}
+
+.archivo-link {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.archivo-icon {
+    width: 24px;
+    height: 24px;
+}
 
 .archivo-item a {
     text-decoration: none;
     color: #2c2c2c;
     font-weight: 500;
+}
+
+.archivo-item a.download-icon {
+    font-size: 20px;
+    color: #5468ff;
+    font-weight: 600;
 }
 
 .archivo-item a:hover { color: #5468ff; }

@@ -9,27 +9,58 @@
 <body>
     <!-- Navbar -->
     <nav class="navbar">
-        <a href="{{ url_for('index') }}">Registro de Asistencia</a>
+        <a href="{{ url_for('asistencia') }}">Registro de Asistencia</a>
         <a href="{{ url_for('registros') }}">Registros de Empleados</a>
         <a href="{{ url_for('logout') }}" class="logout">Cerrar Sesión</a>
     </nav>
 
-    <div class="container" style="min-height:500px; margin: 100px 0px 0px 400px;">
+    <div class="container" style="min-height:400px; margin-top: 100px;">
         <h2>📁 Registros de Empleados</h2>
+
+        <!-- Filtro de Fecha -->
+        <form class="filtro-form" method="GET" action="{{ url_for('registros') }}">
+            <!-- Se añade un id="filtro-fecha" para el script -->
+            <input type="date" name="fecha" id="filtro-fecha" value="{{ fecha_filtro if fecha_filtro else '' }}">
+            <button type="submit">Filtrar</button>
+            <a href="{{ url_for('registros') }}" class="limpiar-filtro">Limpiar</a>
+        </form>
+
         <div class="archivos-container">
-            {% for archivo in archivos %}
-                <div class="archivo-item">
-                    <div class="archivo-link">
-                        <img class="archivo-icon" src="https://cdn-icons-png.flaticon.com/512/337/337946.png" alt="Excel">
-                        <a href="{{ url_for('descargar_archivo', archivo=archivo) }}" target="_blank">{{ archivo }}</a>
+            {% if not archivos %}
+                <p style="text-align:center; margin-top:50px;">
+                    {% if fecha_filtro %}
+                        No se encontraron registros para la fecha seleccionada.
+                    {% else %}
+                        No hay registros disponibles.
+                    {% endif %}
+                </p>
+            {% else %}
+                {% set fecha_actual = '' %}
+                {% for archivo in archivos %}
+                    {% set fecha_archivo = archivo.split('(')[1].split(')')[0] %}
+                    {% if fecha_archivo != fecha_actual %}
+                        {% set fecha_actual = fecha_archivo %}
+                        <h3 class="separador-fecha">{{ fecha_actual }}</h3>
+                    {% endif %}
+                    <div class="archivo-item">
+                        <div class="archivo-link">
+                            <img class="archivo-icon" src="https://cdn-icons-png.flaticon.com/512/888/888850.png" alt="Excel">
+                            <a href="{{ url_for('descargar_archivo', archivo=archivo) }}" target="_blank">{{ archivo }}</a>
+                        </div>
+                        <a href="{{ url_for('descargar_archivo', archivo=archivo) }}" class="download-icon">⬇️</a>
                     </div>
-                    <a href="{{ url_for('descargar_archivo', archivo=archivo) }}" style="color:#5468ff; font-weight:600;">⬇️</a>
-                </div>
-            {% endfor %}
-            {% if archivos|length == 0 %}
-                <p style="text-align:center; margin-top:50px;">No hay registros disponibles</p>
+                {% endfor %}
             {% endif %}
         </div>
     </div>
+
+    <!-- SCRIPT AÑADIDO PARA BLOQUEAR FECHAS FUTURAS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fechaInput = document.getElementById('filtro-fecha');
+            const hoy = new Date().toISOString().split('T')[0];
+            fechaInput.setAttribute('max', hoy);
+        });
+    </script>
 </body>
 </html>
