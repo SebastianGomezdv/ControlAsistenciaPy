@@ -172,12 +172,14 @@ def guardar_registros_dia():
         column_len = max(df_hoy[value].astype(str).map(len).max(), len(value)) + 2
         worksheet.set_column(col_num, col_num, column_len)
 
-    # Aplicar formato a las filas de datos con colores alternados
+    # Aplicar formato a las filas de datos con colores alternados (solo columnas existentes)
+    ncols = len(df_hoy.columns)
     for row_num in range(len(df_hoy)):
-        if (row_num + 1) % 2 == 0:
-            worksheet.set_row(row_num + 1, cell_format=cell_format_par)
-        else:
-            worksheet.set_row(row_num + 1, cell_format=cell_format_impar)
+        fmt = cell_format_par if (row_num + 1) % 2 == 0 else cell_format_impar
+        for col_num in range(ncols):
+            value = df_hoy.iat[row_num, col_num]
+            worksheet.write(row_num + 1, col_num, value, fmt)
+# ...existing code...
 
     writer.close()
 
